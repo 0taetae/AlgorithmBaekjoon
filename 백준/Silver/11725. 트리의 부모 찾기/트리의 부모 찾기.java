@@ -14,6 +14,8 @@ public class Main {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		int N = Integer.parseInt(br.readLine());
 		visit =new boolean[N+1];
+		
+		// 해당 노드(인덱스)의 부모노드 배열
 		result = new int[N+1];
 		
 		// 2차원 ArrayList 생성
@@ -30,7 +32,7 @@ public class Main {
 			list[b].add(a);
 		}
 		
-		// 1부터 시작, visit로 true 인 것은 패스
+		// 트리의 루트인 1부터 시작
 		DFS(1);
 		for(int i=2;i<=N;i++) {
 			System.out.println(result[i]);
@@ -38,14 +40,17 @@ public class Main {
 
 	}
 	public static void DFS(int start) {
-		
 		for(int i=0;i<list[start].size();i++) {
+			// 부모노드의 자식 찾기
 			target = (int) list[start].get(i);
+			// 방문하지 않은 자식 노드
 			if(!visit[target]) {
 				visit[start] = true;
 				visit[target]=true;
+				// start는 부모노드, target은 자식노드
 				result[target] = start;
-				DFS(target);
+				// 해당 자식 노드가 부모노드가 되어 자식 노드 찾기
+				DFS(target);  
 			}
 			
 		}

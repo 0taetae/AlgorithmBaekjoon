@@ -12,11 +12,13 @@ public class Main {
 	static int[][] A;  // 각 나라 인구수 
 	static int L;  // 나이 차이가 L명 이상
 	static int R;  // 나이 차이가 R명 이하 
+	
 	// 인구수 4방향 비교를 위한 방향벡터 dr, dc 
 	static int[] dr = {-1, 0, 1, 0};
 	static int[] dc = {0, 1, 0, -1};
 	static boolean[][] visit ;
 	
+	// 인구이동이 필요한 나라의 인덱스를 저장하는 리스트 
 	static ArrayList<Idx> list;  
 	public static class Idx {
 		int r;
@@ -45,10 +47,13 @@ public class Main {
 		System.out.println(move());
 
 	}
+	
+	// 4방향 각 나라의 인구 탐색 
 	public static int bfs(int r, int c) {
 		Queue<Idx> q = new LinkedList<>();
 		list = new ArrayList<Idx>(); 
-		// offer - 큐가 꽉찬 경우 false 반환, add - 큐가 꽉찬 경우 에러 발생
+		
+		// 해당 나라 위치(인덱스) 저장 
 		q.offer(new Idx(r,c));
 		list.add(new Idx(r,c));
 		visit[r][c] = true;
@@ -75,6 +80,8 @@ public class Main {
 		return sum;
 		
 	}
+	
+	// 인구 이동 
 	public static int move() {
 		int count = 0;
 		while(true) {
@@ -84,6 +91,7 @@ public class Main {
 				for(int j=0;j<N;j++) {
 					if(!visit[i][j]) {
 						int sum = bfs(i,j);
+						// 조건에 부합하는 나라의 리스트가 2개 이상이면 인구 이동 
 						if(list.size() >1) {
 							changePopulation(sum);
 							isMove = true;
@@ -91,12 +99,15 @@ public class Main {
 					}
 				}
 			}
+			//인구이동이 일어나지 않을 때 까지 반복 
 			if(!isMove) {
 				return count;
 			}
 			count++;
 		}
 	}
+	
+	// 나라 연합, 인구 수 바뀜  
 	public static void changePopulation(int sum) {
 		int changeValue = sum/list.size();
 		for(int i=0;i<list.size();i++) {

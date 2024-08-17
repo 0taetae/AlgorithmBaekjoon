@@ -28,7 +28,7 @@ class Solution
 			for(int r=0;r<100;r++) {
                 String str = br.readLine();
                 for(int c=0;c<100;c++) {
-                    map[r][c]=str.charAt(c)-48;
+                    map[r][c]=str.charAt(c)-'0';
                     if(map[r][c]==2) {
                     	sxidx = r; 
                     	syidx = c;

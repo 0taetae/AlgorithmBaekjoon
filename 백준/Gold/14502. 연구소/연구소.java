@@ -1,10 +1,5 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.StringTokenizer;
-
+import java.io.*;
+import java.util.*;
 
 public class Main {
 	
@@ -38,14 +33,14 @@ public class Main {
 				lab[r][c] = Integer.parseInt(st.nextToken());
 			}
 		}
-		dfs(0);
+		wall(0);
 		System.out.println(result);
 		
 
 	}
+	
 	// 벽 세우기 
-	public static void dfs(int count) {
-		// 벽 3개 세웠을 때 안전 영역 구하기 
+	public static void wall(int count) {
 		if(count == 3) {
 			virus();
 			return;
@@ -54,29 +49,27 @@ public class Main {
 			for(int c=0; c<M ; c++) {
 				if(lab[r][c] == 0) {
 					lab[r][c] = 1;
-					dfs(count+1);
+					wall(count+1);
 					lab[r][c] = 0;
 				}
 			}
 		}
 	}
 	
+	// 바이러스 있는 곳 확인, 바이러스 퍼짐 
 	public static void virus() {
 		Queue<Idx> q = new LinkedList<>();
 		
 		int[][] copylab = new int[N][M];
-		int count=0;
+		for(int r=0; r<N;r++) {
+			copylab[r] = Arrays.copyOf(lab[r], lab[r].length);
+		}
+		
 		for(int r=0;r<N;r++) {
 			for(int c=0;c<M;c++) {
-				copylab[r][c] = lab[r][c];
-				
 				// 바이러스가 있는 곳은 큐에 넣기 
 				if(copylab[r][c]==2) {
 					q.offer(new Idx(r,c));
-				}
-				// 빈칸 개수 
-				if(copylab[r][c]==0) {
-					count++;
 				}
 			}
 		}
@@ -94,16 +87,31 @@ public class Main {
 				
 				if (x < 0 || y < 0 || x >= N || y >= M ) continue;
 				
-				// 바이러스 퍼뜨리기 
+				// 빈칸일 때 바이러스 퍼짐  
 				if(copylab[x][y]==0) {
 					copylab[x][y] = 2;
 					q.offer(new Idx(x,y));
-					count--;
 				}
 				
 			}
 		}
-		result = Math.max(result, count);
+		Safe(copylab);
+		
+	}
+	
+	// 안전영역 크기 구하기 
+	public static void Safe(int[][] copylab) {
+		int size=0;
+		for(int r=0;r<N;r++) {
+			for(int c=0; c<M;c++) {
+				// 벽으로 인해 바이러스가 퍼지지 못한 곳 
+				if(copylab[r][c]==0) {
+					size++;
+				}
+			}
+		}
+		// 안전영역 최댓값 구하기 
+		result = Math.max(result, size);
 		
 	}
 	

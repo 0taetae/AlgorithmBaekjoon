@@ -48,7 +48,6 @@ class Solution
                 }
             }
             sb.append("#").append(i).append(" ").append(maxLength).append("\n");
-            
         }
         System.out.println(sb);
     }

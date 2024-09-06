@@ -33,6 +33,7 @@ public class Solution {
                 }
             }
             res = 0;
+            // 첫번째 일꾼이 채취할 벌통 선택
             for(int r=0;r<N;r++) {
             	for(int c=0;c<=N-M;c++) {
             		subSet1(0,r,c);
@@ -42,11 +43,9 @@ public class Solution {
         }
         System.out.println(sb);
     }
+    // 두번째 일꾼이 채취할 벌통 선택 
     static void pick(int r, int c) {
     	for(int j=c;j<=N-M;j++) {
-			if(j>N-M) {
-				break;
-			}
 			subSet2(0,r,j);
 		}
     	for(int i=r+1;i<N;i++) {
@@ -55,6 +54,7 @@ public class Solution {
     		}
     	}
     }
+    // 선택한 벌통에서 채취할 꿀 선택 (첫번째 일꾼)
     static void subSet1(int cnt, int r,int k) {
     	if(cnt==M) {
     		sumA=0;
@@ -76,6 +76,7 @@ public class Solution {
     	selected1[cnt] = false;
     	subSet1(cnt+1,r, k);
     }
+    // 선택한 벌통에서 채취할 꿀 선택 (두번째 일꾼)
     static void subSet2(int cnt, int r,int k) {
     	if(cnt==M) {
     		sumB=0;
@@ -95,5 +96,5 @@ public class Solution {
     	subSet2(cnt+1,r, k);
     	selected2[cnt] = false;
     	subSet2(cnt+1,r, k);
-    } 
+    }
 }

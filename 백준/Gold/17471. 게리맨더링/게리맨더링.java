@@ -14,6 +14,7 @@ public class Main {
     static int result;
     static int[] population;
     static boolean[] visit;
+    static boolean isOk;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -22,7 +23,7 @@ public class Main {
         
         population = new int[N]; // 구역마다 인구수
         isSelected = new boolean[N]; // 선거구를 나누기 위한 부분집합을 구할 때 사용 
-        
+        isOk = false;
         st = new StringTokenizer(br.readLine());
         for (int i = 0; i < N; i++) {
             population[i] = Integer.parseInt(st.nextToken());
@@ -46,10 +47,10 @@ public class Main {
         powerSet(0);
         
         // 두 선거구로 나눌 수 없는 경우 -1 출력
-        if(result==Integer.MAX_VALUE) {
-        	System.out.println(-1);
-        }else {
+        if(isOk) {
         	System.out.println(result);
+        }else {
+        	System.out.println(-1);
         }
         
     }
@@ -67,6 +68,7 @@ public class Main {
             }
             // 한쪽 선거구에 구역이 몰려 있지 않고, 해당 선거구의 구역들이 서로 인접해 있으면, 인구수의 차이 구하기 
             if (!select.isEmpty() && !noselect.isEmpty() && adjCheck(select) && adjCheck(noselect)) {
+                isOk = true;
                 count();
             }
             return;
@@ -110,6 +112,7 @@ public class Main {
 
     // 인구 차 구하기
     public static void count() {
+    	
         int sumA = 0;
         int sumB = 0;
         for (int i = 0; i < N; i++) {

@@ -2,98 +2,119 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-	
-	static int N, M;
-	static class Info {
-		int x, y;
-		Info(int x, int y) {
-			this.x = x;
-			this.y = y;
-		}
-	}
-	static class Edge implements Comparable<Edge> {
-		int start, end;
-		double weight;
-		Edge(int start, int end, double weight) {
-			this.start = start;
-			this.end = end;
-			this.weight = weight;
-		}
-		@Override
-		public int compareTo(Edge o) {
-			return Double.compare(this.weight, o.weight);
-		}
-	}
 
-	static Info[] nodes;
-	static ArrayList<Edge> edges;
-	static int[] parents;
+    static int N, M;
+    static int[][] map, linked;
+    static PriorityQueue<Node> pq = new PriorityQueue<>();
+    static int[] parents;
 
-	static void make() {
-		parents = new int[N + 1];
-		Arrays.fill(parents, -1);
-	}
+    static class Node implements Comparable<Node> {
+        int from, to;
+        double value;
 
-	static int findSet(int a) {
-		if (parents[a]<0) return a;
-		return parents[a] = findSet(parents[a]);
-	}
+        Node(int from, int to, double value) {
+            this.from = from;
+            this.to = to;
+            this.value = value;
+        }
 
-	static boolean union(int a, int b) {
-		int aRoot = findSet(a);
-		int bRoot = findSet(b);
-		if (aRoot == bRoot) return false;
-		parents[bRoot] = aRoot;
-		return true;
-	}
+        public int compareTo(Node o) {
+            return Double.compare(this.value, o.value);
+        }
+    }
 
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st;
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        N = Integer.parseInt(st.nextToken()); // 우주신 개수
+        M = Integer.parseInt(st.nextToken()); // 연결 통로 개수
 
-		st = new StringTokenizer(br.readLine());
-		N = Integer.parseInt(st.nextToken());
-		M = Integer.parseInt(st.nextToken());
+        map = new int[N][2];
+        linked = new int[M][2];
+        parents = new int[N];
 
-		make();
+        for (int i = 0; i < N; i++) {
+            st = new StringTokenizer(br.readLine()); // N개의 줄 : 우주신 좌표
+            for (int j = 0; j < 2; j++) {
+                map[i][j] = Integer.parseInt(st.nextToken());
+            }
+        }
+        for (int i = 0; i < M; i++) {
+            st = new StringTokenizer(br.readLine()); // 연결된 통로
+            for(int j = 0; j < 2; j++) {
+                linked[i][j] = Integer.parseInt(st.nextToken());
+            }
+        }
 
-		// 각 우주신들의 x, y 좌표
-		nodes = new Info[N + 1];
-		for (int i = 1; i <= N; i++) {
-			st = new StringTokenizer(br.readLine());
-			int x = Integer.parseInt(st.nextToken());
-			int y = Integer.parseInt(st.nextToken());
-			nodes[i] = new Info(x, y);
-		}
 
-		// 이미 연결된 통로
-		for (int i = 0; i < M; i++) {
-			st = new StringTokenizer(br.readLine());
-			int a = Integer.parseInt(st.nextToken());
-			int b = Integer.parseInt(st.nextToken());
-			union(a, b);
-		}
+        init();
+        initNode();
 
-		// 우주신 간의 거리 
-		edges = new ArrayList<>();
-		for (int i = 1; i <= N; i++) {
-			for (int j = i + 1; j <= N; j++) {
-				double w = Math.sqrt(Math.pow(nodes[i].x - nodes[j].x, 2) + Math.pow(nodes[i].y - nodes[j].y, 2));
-				edges.add(new Edge(i, j, w));
-			}
-		}
+        // 기존 연결통로 처리
+        for (int i = 0; i < linked.length; i++) {
+            union(linked[i][0]-1, linked[i][1]-1);
+        }
 
-		// 통로의 길이를 기준으로 오름차순 정렬
-		Collections.sort(edges);
+        double total = 0;
 
-		double res = 0;
-		for (Edge edge : edges) {
-			// 연결되지 않은 두 우주신 연결
-			if (union(edge.start, edge.end)) {
-				res += edge.weight;
-			}
-		}
+        while (!pq.isEmpty()) {
+            Node node = pq.poll();
+            int from = find(node.from);
+            int to = find(node.to);
 
-		System.out.printf("%.2f", res);
-	}
+            if (!isSame(from, to)) {
+                total += node.value;
+                union(node.from, node.to);
+            }
+
+        }
+
+        System.out.printf("%.2f", total);
+
+    }
+
+    static void init() {
+        for (int i = 0; i < N; i++) {
+            parents[i] = i;
+        }
+    }
+
+    // 조합 + 길이 -> pq추가
+    static void initNode() {
+        int size = map.length;
+        for (int i = 0; i < size - 1; i++) {
+            int x1 = map[i][0], y1 = map[i][1];
+            for (int j = i + 1; j < size; j++) {
+                int x2 = map[j][0], y2 = map[j][1];
+                double dist = calDist(x1, y1, x2, y2);
+                pq.offer(new Node(i, j, dist));
+            }
+        }
+    }
+
+    static double calDist(int x1, int y1, int x2, int y2) {
+        long w = x2 - x1;
+        long h = y2 - y1;
+        return Math.sqrt(w*w + h*h);
+}
+
+    static int find(int x) {
+        if (parents[x] == x) return x;
+        return parents[x] = find(parents[x]);
+    }
+
+    static void union(int x, int y) {
+        x = find(x);
+        y = find(y);
+
+        if (x != y) parents[y] = x;
+    }
+
+    static boolean isSame(int x, int y) {
+        x = find(x);
+        y = find(y);
+
+        if (x == y) return true;
+        return false;
+    }
 }

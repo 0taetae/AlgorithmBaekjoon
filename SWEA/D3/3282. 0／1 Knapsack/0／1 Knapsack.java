@@ -36,6 +36,4 @@ public class Solution {
 			System.out.println("#"+tc+" "+dp[N][K]);
 		}
 	}
-
-
 }

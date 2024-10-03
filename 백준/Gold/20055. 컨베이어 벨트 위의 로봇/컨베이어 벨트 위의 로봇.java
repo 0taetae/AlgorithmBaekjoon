@@ -13,7 +13,7 @@ public class Main {
 		int K = Integer.parseInt(st.nextToken());
 		
 		int[] belt = new int[2*N];
-		int[] robot = new int[2*N];
+		int[] robot = new int[N];
 		st = new StringTokenizer(br.readLine());
 		for(int i=0;i<2*N;i++) {
 			belt[i] = Integer.parseInt(st.nextToken());  // 각 칸의 내구도 
@@ -26,9 +26,11 @@ public class Main {
 			int temp = belt[2*N-1];
 			for(int i=2*N-1;i>=1;i--) {
 				belt[i] = belt[i-1];
-				robot[i] = robot[i-1];
 			}
 			belt[0] = temp;
+			for(int i=N-1;i>=1;i--) {
+				robot[i] = robot[i-1];
+			}
 			robot[0] = 0;
 			
 			// 내리는 위치에서 로봇 내리기 
@@ -49,7 +51,7 @@ public class Main {
 			robot[N-1]=0;
 			
 			// 내구성이 1이상이고, 로봇이 없으면 로봇 올리기 
-			if(belt[0]>0 && robot[0]==0) {
+			if(belt[0]>=1 && robot[0]==0) {
 				robot[0]=1;
 				belt[0]--;
 				if(belt[0]==0) cnt++;

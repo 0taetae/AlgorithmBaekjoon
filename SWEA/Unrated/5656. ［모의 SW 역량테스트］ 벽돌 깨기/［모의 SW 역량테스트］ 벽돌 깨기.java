@@ -4,11 +4,10 @@ import java.util.*;
 public class Solution {
 	
 	static int N,W,H;
-	static int ans;
 	static int[][] map,copy;
 	static int[] selected;
 	static boolean[][] visited;
-	static int res,total;
+	static int res;
 	static class Info{
 		int x,y,num;
 		Info(int x, int y, int num){
@@ -19,11 +18,6 @@ public class Solution {
 	}
 	static int[] dx = {-1,1,0,0};
 	static int[] dy = {0,0,-1,1};
-	/*
-	구슬 - 좌우로만 움직일 수 있음 -> 항상 맨 위에 있는 벽돌만 깨트릴 수 있음
-	구슬 -> 벽돌 : 상하좌루 벽돌에 (적힌 숫자-1) 칸 만큼 같이 제거
-	
-	 */
 
 	public static void main(String[] args) throws IOException{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -40,34 +34,24 @@ public class Solution {
 			map = new int[H][W];
 			copy = new int[H][W];
 			selected = new int[N];
-			
 			res = Integer.MAX_VALUE;
-			total = 0;
 			for(int r=0;r<H;r++) {
 				st = new StringTokenizer(br.readLine());
 				for(int c=0;c<W;c++) {
 					int num = Integer.parseInt(st.nextToken());
 					map[r][c] =num;
 					copy[r][c] = num;
-					if(num!=0) {
-						total++;
-					}
 				}
 			}
 			perm(0);
-			//System.out.println("총 벽돌 수 " +total);
 			sb.append("#").append(tc).append(" ").append(res).append("\n");
-			
-			
 		}
 		System.out.println(sb);
-
 	}
 	
 	// 중복순열로 구슬 쏠 위치 정하기
 	public static void perm(int cnt) {
 		if(cnt == N) {
-			ans=0;
 			for(int i=0;i<N;i++) {
 				shoot(selected[i]);  // 구슬 쏘기
 			}
@@ -78,7 +62,6 @@ public class Solution {
 		for(int i=0;i<W;i++) {
 			selected[cnt] = i;
 			perm(cnt+1);
-			
 		}
 	}
 
@@ -86,43 +69,32 @@ public class Solution {
 	static void shoot(int idx) {
 		for(int i=0;i<H;i++) {
 			if(map[i][idx]!=0) {
-				//System.out.println(i+" 행 "+idx+" 열 "+map[i][idx]+" 벽돌값");
 				clear(i, idx,map[i][idx]);  // 벽돌 깨트리기 
-				
 				return;
 			}
 		}
 	}
 	static void clear(int r,int c, int num) {
 		Queue<Info> q = new LinkedList<>();
-		//ArrayList<Info> lst = new ArrayList<>();
 		visited = new boolean[H][W];
-		
 		q.add(new Info(r,c,num));
-		//lst.add(new Info(r,c,num));
 		visited[r][c] = true;
 		
 		while(!q.isEmpty()) {
 			Info cur = q.poll();
 			map[cur.x][cur.y] = 0;
-			//visited[cur.x][cur.y] = true;
 			for(int dir=0;dir<4;dir++) {
 				for(int i=0;i<=cur.num-1;i++) {
 					int nx = cur.x+dx[dir]*i;
 					int ny = cur.y+dy[dir]*i;
 					
 					// 배열 범위 넘어가는 경우
-					if(nx<0 || nx>=H || ny<0 || ny>=W) continue;
-					
-					if(map[nx][ny]==0 || visited[nx][ny]) continue;
+					if(nx<0 || nx>=H || ny<0 || ny>=W || map[nx][ny]==0 || visited[nx][ny]) continue;
 					q.add(new Info(nx,ny,map[nx][ny]));
 					visited[nx][ny] = true;
-					//ans++;
 				}
 			}
 		}
-		
-		
 		down(r,c,num);   // 벽돌 내리기
 	}
 	
@@ -133,7 +105,7 @@ public class Solution {
 			// 행
 			for(int j=H-1;j>0;j--) {
 				if(map[j][i]==0) {
-					// 다음 행의 벽돌 중 0이 아닌 벽돌 찾기
+					// 위 행의 벽돌 중 0이 아닌 벽돌 찾기
 					for(int k=j-1;k>=0;k--) {
 						if(map[k][i]!=0) {
 							map[j][i] = map[k][i];
@@ -145,7 +117,6 @@ public class Solution {
 				}
 			}
 		}
-		
 	}
 	// 배열 원상복구 
 	static void reset() {
@@ -164,48 +135,8 @@ public class Solution {
 				if(map[i][j]!=0) {
 					cnt++;
 				}
-				
 			}
 		}
 		return cnt;
 	}
-
 }
-/*
-1
-3 10 10
-0 0 0 0 0 0 0 0 0 0
-1 0 1 0 1 0 0 0 0 0
-1 0 3 0 1 1 0 0 0 1
-1 1 1 0 1 2 0 0 0 9
-1 1 4 0 1 1 0 0 1 1
-1 1 4 1 1 1 2 1 1 1
-1 1 5 1 1 1 1 2 1 1
-1 1 6 1 1 1 1 1 2 1
-1 1 1 1 1 1 1 1 1 5
-1 1 7 1 1 1 1 1 1 1
-
-1
-2 9 10
-0 0 0 0 0 0 0 0 0
-0 0 0 0 0 0 0 0 0
-0 1 0 0 0 0 0 0 0
-0 1 0 0 0 0 0 0 0
-1 1 0 0 1 0 0 0 0
-1 1 0 1 1 1 0 1 0
-1 1 0 1 1 1 0 1 0
-1 1 1 1 1 1 1 1 0
-1 1 3 1 6 1 1 1 1
-1 1 1 1 1 1 1 1 1
-
-
-1
-3 6 7
-1 1 0 0 0 0
-1 1 0 0 1 0
-1 1 0 0 4 0
-4 1 0 0 1 0
-1 5 1 0 1 6
-1 2 8 1 1 6
-1 1 1 9 2 1
-*/

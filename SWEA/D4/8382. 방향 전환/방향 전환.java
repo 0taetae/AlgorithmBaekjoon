@@ -28,32 +28,33 @@ public class Solution {
             int x2 = Integer.parseInt(st.nextToken());
             int y2 = Integer.parseInt(st.nextToken());
             
-//            if (x1 == x2 && y1 == y2) {
-//                System.out.println("#" + tc + " " + 0);
-//            } else {
-//                System.out.println("#" + tc + " " + bfs(x1 + 100, y1 + 100, x2 + 100, y2 + 100));
-//            }
             if (x1 == x2 && y1 == y2) {
-				System.out.println("#" + tc + " " + 0);
-			} else {
-				int w = Math.abs(y1 - y2);
-				int h = Math.abs(x1 - x2);
-				int res=0;
-				if(Math.abs(w-h)%2==0) {
-					res = Math.max(w, h)*2;
-				}else {
-					res = Math.max(w, h)*2-1;
-				}
-				System.out.println("#" + tc + " " + res);
-			}
+                System.out.println("#" + tc + " " + 0);
+            } else {
+                System.out.println("#" + tc + " " + bfs(x1 + 100, y1 + 100, x2 + 100, y2 + 100));
+            }
+//            if (x1 == x2 && y1 == y2) {
+//				System.out.println("#" + tc + " " + 0);
+//			} else {
+//				int w = Math.abs(y1 - y2);
+//				int h = Math.abs(x1 - x2);
+//				int res=0;
+//				if(Math.abs(w-h)%2==0) {
+//					res = Math.max(w, h)*2;
+//				}else {
+//					res = Math.max(w, h)*2-1;
+//				}
+//				System.out.println("#" + tc + " " + res);
+//			}
         }
     }
-    /*
+    
     private static int bfs(int x1, int y1, int x2, int y2) {
         Queue<Info> q = new LinkedList<>();
-        boolean[][] visited = new boolean[201][201]; 
+        boolean[][][] visited = new boolean[201][201][2]; 
         
-        visited[x1][y1] = true;
+        visited[x1][y1][0] = true;
+        visited[x1][y1][1] = true;
         q.add(new Info(x1, y1, 0, 0)); // 가로 방향
         q.add(new Info(x1, y1, 2, 0)); // 세로 방향
 
@@ -70,8 +71,8 @@ public class Solution {
                     int nx = cur.x + dx[dir];
                     int ny = cur.y + dy[dir];
 
-                    if (nx >= 0 && ny >= 0 && nx <= 200 && ny <= 200 && !visited[nx][ny]) {
-                        visited[nx][ny] = true;
+                    if (nx >= 0 && ny >= 0 && nx <= 200 && ny <= 200 && !visited[nx][ny][0]) {
+                        visited[nx][ny][0] = true;
                         q.add(new Info(nx, ny, dir, cur.cnt + 1)); // 세로 방향으로 이동
                     }
                 }
@@ -80,13 +81,13 @@ public class Solution {
                     int nx = cur.x + dx[dir];
                     int ny = cur.y + dy[dir];
 
-                    if (nx >= 0 && ny >= 0 && nx <= 200 && ny <= 200 && !visited[nx][ny]) {
-                        visited[nx][ny] = true;
+                    if (nx >= 0 && ny >= 0 && nx <= 200 && ny <= 200 && !visited[nx][ny][1]) {
+                        visited[nx][ny][1] = true;
                         q.add(new Info(nx, ny, dir, cur.cnt + 1)); 
                     }
                 }
             }
         }
         return -1; 
-    }*/
+    }
 }

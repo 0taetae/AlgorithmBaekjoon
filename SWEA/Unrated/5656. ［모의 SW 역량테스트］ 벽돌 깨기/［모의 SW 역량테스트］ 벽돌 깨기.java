@@ -1,142 +1,150 @@
 import java.io.*;
 import java.util.*;
 
-public class Solution {
-	
-	static int N,W,H;
-	static int[][] map,copy;
+public class Solution{
 	static int[] selected;
-	static boolean[][] visited;
+	static int[][] map, copy;
+	static int N, W, H;
 	static int res;
-	static class Info{
-		int x,y,num;
-		Info(int x, int y, int num){
+
+	static class Info {
+		int x, y, num;
+
+		Info(int x, int y, int num) {
 			this.x = x;
 			this.y = y;
 			this.num = num;
 		}
 	}
-	static int[] dx = {-1,1,0,0};
-	static int[] dy = {0,0,-1,1};
 
-	public static void main(String[] args) throws IOException{
+	static int[] dx = { -1, 1, 0, 0 };
+	static int[] dy = { 0, 0, -1, 1 };
+
+	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st;
-		StringBuilder sb = new StringBuilder();
-		
-		int T = Integer.parseInt(br.readLine());  // 테스트케이스 수
-		for(int tc=1;tc<=T;tc++) {
+		int T = Integer.parseInt(br.readLine());
+		for (int tc = 1; tc <= T; tc++) {
 			st = new StringTokenizer(br.readLine());
-			N = Integer.parseInt(st.nextToken());  // 구슬 수
-			W = Integer.parseInt(st.nextToken());  // 열
-			H = Integer.parseInt(st.nextToken());  // 행
-			
-			map = new int[H][W];
-			copy = new int[H][W];
+			N = Integer.parseInt(st.nextToken());
+			W = Integer.parseInt(st.nextToken());
+			H = Integer.parseInt(st.nextToken());
 			selected = new int[N];
+			map = new int[H][W];
+			copy = new int[H][W]; // 원상복귀를 위한 배열
 			res = Integer.MAX_VALUE;
-			for(int r=0;r<H;r++) {
+
+			for (int r = 0; r < H; r++) {
 				st = new StringTokenizer(br.readLine());
-				for(int c=0;c<W;c++) {
-					int num = Integer.parseInt(st.nextToken());
-					map[r][c] =num;
-					copy[r][c] = num;
+				for (int c = 0; c < W; c++) {
+					map[r][c] = Integer.parseInt(st.nextToken());
+					copy[r][c] = map[r][c];
 				}
 			}
 			perm(0);
-			sb.append("#").append(tc).append(" ").append(res).append("\n");
+			System.out.println("#"+tc+" "+res);
+
 		}
-		System.out.println(sb);
+
 	}
-	
-	// 중복순열로 구슬 쏠 위치 정하기
+
+	// 중복순열
 	public static void perm(int cnt) {
-		if(cnt == N) {
-			for(int i=0;i<N;i++) {
-				shoot(selected[i]);  // 구슬 쏘기
+		if (cnt == N) {
+			for (int i = 0; i < N; i++) {
+				shoot(selected[i]); // 구슬 쏘기
+				
 			}
-			res = Math.min(cntN(),res);  // 벽돌 수 구하기
-			reset(); // 배열 원상복구 
+			res = Math.min(cal(), res); // 벽돌 수 구하기
+			reset(); // 배열 원상복구
 			return;
 		}
-		for(int i=0;i<W;i++) {
+		for (int i = 0; i < W; i++) {
 			selected[cnt] = i;
-			perm(cnt+1);
+			perm(cnt + 1);
+
 		}
 	}
 
 	// 구슬 쏘기
-	static void shoot(int idx) {
-		for(int i=0;i<H;i++) {
-			if(map[i][idx]!=0) {
-				clear(i, idx,map[i][idx]);  // 벽돌 깨트리기 
+	private static void shoot(int c) {
+		for (int i = 0; i < H; i++) {
+			// 벽돌을 발견하면
+			if (map[i][c] != 0) {
+				clear(i, c, map[i][c]);
 				return;
 			}
 		}
-	}
-	static void clear(int r,int c, int num) {
-		Queue<Info> q = new LinkedList<>();
-		visited = new boolean[H][W];
-		q.add(new Info(r,c,num));
-		visited[r][c] = true;
 		
-		while(!q.isEmpty()) {
+
+	}
+
+	private static void clear(int r, int c, int num) {
+		//System.out.println(r+" "+c+" "+num);
+		Queue<Info> q = new LinkedList<>();
+		boolean[][] visited = new boolean[H][W];
+		q.add(new Info(r, c, num));
+		visited[r][c] = true;
+
+		while (!q.isEmpty()) {
 			Info cur = q.poll();
 			map[cur.x][cur.y] = 0;
+			
 			for(int dir=0;dir<4;dir++) {
-				for(int i=0;i<=cur.num-1;i++) {
+				for(int i=0;i<cur.num;i++) {
 					int nx = cur.x+dx[dir]*i;
 					int ny = cur.y+dy[dir]*i;
-					
-					// 배열 범위 넘어가는 경우
-					if(nx<0 || nx>=H || ny<0 || ny>=W || map[nx][ny]==0 || visited[nx][ny]) continue;
+					if(nx<0 || ny<0 || nx>=H || ny>=W) continue;
+					if(map[nx][ny]==0 || visited[nx][ny]) continue;
 					q.add(new Info(nx,ny,map[nx][ny]));
-					visited[nx][ny] = true;
+					visited[nx][ny]=true;
 				}
 			}
 		}
-		down(r,c,num);   // 벽돌 내리기
+		// 벽돌 내리기
+		down();
+		
+		
+
 	}
-	
-	// 구슬을 쏜 후 빈공간 생김 -> 벽돌 내림
-	static void down(int r,int c,int num) {
-		// 열
-		for(int i=0;i<W;i++) {
-			// 행
-			for(int j=H-1;j>0;j--) {
+
+	private static void down() {
+		for(int i=0;i<W;i++) {//열
+			for(int j=H-1;j>=0;j--) {//행
 				if(map[j][i]==0) {
-					// 위 행의 벽돌 중 0이 아닌 벽돌 찾기
-					for(int k=j-1;k>=0;k--) {
-						if(map[k][i]!=0) {
-							map[j][i] = map[k][i];
-							map[k][i]=0;
+					// 0이 아닌 행 찾기 
+					for(int s=j-1;s>=0;s--) {
+						if(map[s][i]!=0) {
+							map[j][i] = map[s][i];
+							map[s][i]=0;
 							break;
 						}
-						
 					}
 				}
 			}
 		}
 	}
-	// 배열 원상복구 
-	static void reset() {
-		for(int i=0;i<H;i++) {
-			for(int j=0;j<W;j++) {
-				map[i][j] = copy[i][j];
-			}
-		}
-	}
-	
-	// 남은 벽돌 수 구하기 
-	private static int cntN() {
+
+	// 깨고 남은 벽돌 수 구하기
+	private static int cal() {
 		int cnt = 0;
-		for(int j=0;j<W;j++) {
-			for(int i=H-1;i>=0;i--) {
-				if(map[i][j]!=0) {
+		for (int r = 0; r < H; r++) {
+			for (int c = 0; c < W; c++) {
+				if (map[r][c] != 0) {
 					cnt++;
 				}
 			}
 		}
 		return cnt;
 	}
+
+	// 배열 원상복구
+	private static void reset() {
+		for (int r = 0; r < H; r++) {
+			for (int c = 0; c < W; c++) {
+				map[r][c] = copy[r][c];
+			}
+		}
+	}
+
 }

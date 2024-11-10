@@ -60,12 +60,10 @@ public class Main{
 
                     dfs(r, c + 1);
 
-                    if (!isFinished) {
-                        map[r][c] = 0;
+                    map[r][c] = 0;
                         visitedR[r][i] = false;
                         visitedC[c][i] = false;
                         visited33[r/3][c/3][i] = false;
-                    }
                 }
             }
         } else {

@@ -1,122 +1,119 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
 
 public class Solution {
-	static int R, C;
-    static char[][] arr;
-    static int[] dx = {-1, 0, 1, 0}; // up, right, down, left
-    static int[] dy = {0, 1, 0, -1};
-    static boolean[][][][] visit;
-    static boolean result;
+	
+	static int R,C;
+	static char[][] map;
+	// 0,0에서 시작 오른쪽 방향으로 이동
+	
+	// 우, 하, 좌, 상 
+	static int[] dx = {0,1,0,-1};
+	static int[] dy = {1,0,-1,0};
+	static boolean[][][][] visited;
+	static boolean isOk;
 
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringBuilder sb = new StringBuilder();
-        StringTokenizer st;
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st;
+		int T = Integer.parseInt(br.readLine());
+		for(int tc=1;tc<=T;tc++) {
+			st = new StringTokenizer(br.readLine());
+			R = Integer.parseInt(st.nextToken());
+			C = Integer.parseInt(st.nextToken());
+			map = new char[R][C];
+			for(int r=0;r<R;r++) {
+				String str = br.readLine();
+				for(int c=0;c<C;c++) {
+					map[r][c] = str.charAt(c);
+				}
+			}
+			isOk = false;
+			visited = new boolean[R][C][4][16];
+			move(0,0,0,0);
+			
+			if(isOk) {
+				System.out.println("#"+tc+" "+"YES");
+			}else {
+				System.out.println("#"+tc+" "+"NO");
+			}
+		}
 
-        int T = Integer.parseInt(br.readLine());
-        for (int i = 1; i <= T; i++) {
-            st = new StringTokenizer(br.readLine());
-            R = Integer.parseInt(st.nextToken());
-            C = Integer.parseInt(st.nextToken());
-
-            arr = new char[R][C];
-            for (int r = 0; r < R; r++) {
-                String str = br.readLine();
-                for (int c = 0; c < C; c++) {
-                    arr[r][c] = str.charAt(c);
-                }
+	}
+	public static void move(int r,int c,int dir,int num) {
+		// 도착 가능할 때
+		if(isOk) return;
+		if(r<0) r=R-1;
+		if(r>=R) r=0;
+		if(c<0) c=C-1;
+		if(c>=C) c=0;
+		
+		// 무한 반복 -> 도착 불가 
+		if(visited[r][c][dir][num]) return;
+		
+		visited[r][c][dir][num] = true;
+		
+		int nextDir = dir;
+		int nextNum = num;
+		switch(map[r][c]) {
+		case '<':
+			nextDir = 2;
+			break;
+		case '>':
+			nextDir = 0;
+			break;
+		case '^':
+			nextDir = 3;
+			break;
+		case 'v':
+			nextDir = 1;
+			break;
+		case '_':
+			if(num==0) {
+				nextDir = 0;
+			}else {
+				nextDir=2;
+			}
+			break;
+		case '|':
+			if(num==0) {
+				nextDir = 1;
+			}else {
+				nextDir = 3;
+			}
+			break;
+		case '?':
+			for (int i = 0; i < 4; i++) {
+				nextDir = (dir + i) % 4;
+                move(r + dx[nextDir], c + dy[nextDir], nextDir, nextNum);
             }
-
-            visit = new boolean[R][C][4][16]; // 행, 열, 방향, 메모리
-            result = false;
-
-            ver(0, 0, 1, 0); // 시작 위치 (0,0), 오른쪽, 메모리 0
-            if(result) {
-            	sb.append("#").append(i).append(" YES").append("\n");
-            }else {
-            	sb.append("#").append(i).append(" NO").append("\n");
-            }
-            
-        }
-        System.out.print(sb);
-    }
-
-    static void ver(int r, int c, int dir, int memory) {
-        if (result) return;
-
-        if (r < 0) r = R - 1;
-        if (r >= R) r = 0;
-        if (c < 0) c = C - 1;
-        if (c >= C) c = 0;
-
-        if (visit[r][c][dir][memory]) return;
-        visit[r][c][dir][memory] = true;
-
-        int nextDir = dir;
-        int nextMemory = memory;
-
-        switch (arr[r][c]) {
-            case '<':
-                nextDir = 3;
-                break;
-            case '>':
-                nextDir = 1;
-                break;
-            case '^':
-                nextDir = 0;
-                break;
-            case 'v':
-                nextDir = 2;
-                break;
-            case '_':
-            	if(memory==0) {
-            		nextDir = 1;
-            	}else {
-            		nextDir = 3;
-            	}
-                break;
-            case '|':
-            	if(memory==0) {
-            		nextDir = 2;
-            	}else {
-            		nextDir = 0;
-            	}
-                break;
-            case '?':
-            	// 4방향중 랜덤
-                for (int i = 0; i < 4; i++) {
-                    int newDir = (dir + i) % 4;
-                    ver(r + dx[newDir], c + dy[newDir], newDir, memory);
-                }
-                return;
-            case '.':
-                break;
-            case '@':
-                result = true;
-                return;
-            case '+':
-            	if(memory==15) {
-            		nextMemory = 0;
-            	}else {
-            		nextMemory = memory+1;
-            	}
-                break;
-            case '-':
-            	if(memory==0) {
-            		nextMemory = 15;
-            	}else {
-            		nextMemory = memory-1;
-            	}
-                break;
-            default:
-                nextMemory = arr[r][c] - '0';
-                break;
-        }
-
-        ver(r + dx[nextDir], c + dy[nextDir], nextDir, nextMemory);
-    }
+			return;
+		case '.':
+			break;
+		case '@':
+			isOk = true;
+			return;
+		case '+':
+			nextNum++;
+			if(nextNum==16) {
+				nextNum=0;
+			}
+			break;
+		case '-':
+			nextNum--;
+			if(nextNum<0) {
+				nextNum=15;
+			}
+			break;
+		default:
+			nextNum = map[r][c]-'0';
+			break;
+		
+		}
+		
+		
+		move(r+dx[nextDir],c+dy[nextDir],nextDir,nextNum);
+		
+	}
 
 }

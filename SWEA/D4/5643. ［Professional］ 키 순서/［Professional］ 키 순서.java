@@ -3,50 +3,59 @@ import java.util.*;
 
 public class Solution {
 	
+	static int N,M;
+	static boolean[][] Short;
+	static boolean[][] Long;
+
 	public static void main(String[] args) throws IOException{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st;
-		StringBuilder sb = new StringBuilder();
+		
 		int T = Integer.parseInt(br.readLine());
 		for(int tc=1;tc<=T;tc++) {
-			int N = Integer.parseInt(br.readLine());
-			int M = Integer.parseInt(br.readLine());
-			int[][] arr = new int[N+1][N+1];
+			N = Integer.parseInt(br.readLine());  // 학생들의 수
+			M = Integer.parseInt(br.readLine());  // 두 학생 키를 비교한 횟수
+			
+			Short = new boolean[N+1][N+1];  // 자신 보다 작은 사람 
+			Long = new boolean[N+1][N+1];  // 자신 보다 큰 사람
 			for(int i=0;i<M;i++) {
-				st = new StringTokenizer(br.readLine());
-				// a는 b보다 작다 
-				int a = Integer.parseInt(st.nextToken());
-				int b = Integer.parseInt(st.nextToken());
-				arr[a][b] = 1;
+				StringTokenizer st = new StringTokenizer(br.readLine());
+				int a = Integer.parseInt(st.nextToken());  // 작은 사람
+				int b = Integer.parseInt(st.nextToken());  // 큰 사람
+				Long[a][b] = true;
+				Short[b][a] = true;
 			}
-			// 1번은 5번보다 작고, 5번은 4번보다 작다 -> 1번은 4번보다 작다 
-			for(int k=0;k<=N;k++) {
-				for(int i=0;i<=N;i++) {
-					for(int j=0;j<=N;j++) {
-						if(arr[i][k]==1 && arr[k][j]==1) {
-							arr[i][j]=1;
+			
+			// 플로이드 워셜 알고리즘으로 자신보다 작은 사람, 큰 사람 모두 구하기 
+			for(int k=1;k<=N;k++) {
+				for(int i=1;i<=N;i++) {
+					for(int j=1;j<=N;j++) {
+						if(Long[i][k] && Long[k][j]) {
+							Long[i][j] = true;
+						}
+						if(Short[i][k] && Short[k][j]) {
+							Short[i][j] = true;
 						}
 					}
 				}
 			}
-			int res = 0;
+			int res=0;
 			for(int i=1;i<=N;i++) {
-				int cnt =0;
-				// i보다 작은 경우 
+				int sum=0;
 				for(int j=1;j<=N;j++) {
-					if(j==i) continue;
-					if(arr[j][i]==1) cnt++;
+					if(Long[i][j]) {
+						sum++;
+					}
+					if(Short[i][j]) {
+						sum++;
+					}
 				}
-				// i보다 큰 경우 
-				for(int j=1;j<=N;j++) {
-					if(arr[i][j]==1) cnt++;
-				}
-				if(cnt==N-1) {
+				if(sum==N-1) {
 					res++;
 				}
 			}
-			sb.append("#").append(tc).append(" ").append(res).append("\n");
+			System.out.println("#"+tc+" "+res);
 		}
-		System.out.println(sb);
+
 	}
+
 }

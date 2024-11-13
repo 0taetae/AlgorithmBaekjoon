@@ -3,12 +3,14 @@ import java.util.*;
 
 public class Solution {
 	
-	static int[] dx = {1, 1, -1, -1};
-	static int[] dy = {1, -1, -1, 1};
 	static int N;
 	static int[][] map;
-	static boolean[] num;
+	static int startR,startC;
+	static int[] dx = {1,1,-1,-1};
+	static int[] dy = {1,-1,-1,1};
 	static int res;
+	static boolean[][] visited;
+	static boolean[] selected;
 
 	public static void main(String[] args) throws IOException{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -23,38 +25,63 @@ public class Solution {
 				}
 			}
 			res = 0;
-			for(int r=0;r<=N-3;r++) {
-				for(int c=1;c<=N-2;c++) {
-					num = new boolean[101];
-					num[map[r][c]] = true;
-					check(r,c,0,1,r,c);
+			startR = 0;
+			startC = 0;
+			for(int r=0;r<N-1;r++) {
+				for(int c=1;c<N-1;c++) {
+					//System.out.println(r+" "+c+" 시작점");
+					visited = new boolean[N][N];
+					selected = new boolean[101];
+					startR = r;
+					startC = c;
+					visited[r][c] = true;
+					selected[map[r][c]] = true;
+					dfs(r,c,1,0);
+					
 				}
 			}
 			if(res<4) {
-				System.out.println("#"+tc+" "+-1);
+				System.out.println("#"+tc+" "+(-1));
 			}else {
 				System.out.println("#"+tc+" "+res);
 			}
-		}
-	}
-
-	private static void check(int r, int c, int dir, int cnt, int startR, int startC) {
-		for(int i=dir;i<4;i++) {
-			int x = r + dx[i];
-			int y = c + dy[i];
 			
-			if(x<0 || y<0 || x>=N || y>=N) continue;
-			if(x== startR && y==startC) {
+		}
+
+	}
+	public static void dfs(int r, int c, int cnt,int dir ) {
+		
+		for(int i=dir;i<4;i++) {
+			int nx = r + dx[i];
+			int ny = c + dy[i];
+			//System.out.println("다음 점 "+nx+" "+ny);
+			
+			if(nx==startR && ny==startC) {
+				//System.out.println("성공");
+				//System.out.println(cnt);
 				res = Math.max(res, cnt);
 				return;
 			}
-			if(!num[map[x][y]]) {
-				num[map[x][y]] = true;
-				check(x,y,i,cnt+1,startR,startC);
-				num[map[x][y]] = false;
+			
+			if(nx<0 || ny<0 || nx>=N || ny>=N) {
+				//System.out.println("범위 벗어난 곳 ");
+				continue;
 			}
+			if(visited[nx][ny]) {
+				//System.out.println("방문 한 곳");
+				continue;
+			}
+			if(selected[map[nx][ny]]) {
+				//System.out.println("이미 먹은 디저트");
+				continue;
+			}
+			
+			selected[map[nx][ny]] = true;
+			visited[nx][ny] = true;
+			dfs(nx,ny,cnt+1,i);
+			visited[nx][ny] = false;
+			selected[map[nx][ny]] = false;
 		}
-		
 	}
 
 }

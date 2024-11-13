@@ -1,55 +1,36 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
 
-public class Main{
+public class Main {
 
 	public static void main(String[] args) throws IOException{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		
 		int N = Integer.parseInt(br.readLine());
-		int[] tree = new int[N];
 		
+		int even = 0;
+		int odd = 0;
 		StringTokenizer st = new StringTokenizer(br.readLine());
 		for(int i=0;i<N;i++) {
-			tree[i] = Integer.parseInt(st.nextToken());
+			int height = Integer.parseInt(st.nextToken());
+			even+=height/2;
+			odd+=height%2;
 		}
-		int sum = Arrays.stream(tree).sum();
-		if(sum % 3 != 0) {
+		
+		if(even==odd) {
+			System.out.println("YES");
+		}else if(odd>even) {
 			System.out.println("NO");
-		}
-		else {
-			int count1 = 0;
-			int count2 = 0;
-			for(int i=0;i<N;i++) {
-				
-				count2 += tree[i]/2;
-				count1 += tree[i]%2;
-				/*int remain = tree[i] % 3;
-				if(remain == 2) {
-					count2++;
-				} else if(remain == 1) {
-					count1++;
-				}*/
-			}
-			if(count1 == count2) {
+		}else {  // even > odd 
+			int temp = even - odd;
+			if(temp*2%3==0) {
 				System.out.println("YES");
-			}
-			if(count1 > count2) {
+			}else {
 				System.out.println("NO");
-			}
-			if(count2 > count1) {
-				if((count2-count1)%3==0) {
-					System.out.println("YES");
-				}
-				else {
-					System.out.println("NO");
-				}
 			}
 			
 		}
+		
+		
 
 	}
 

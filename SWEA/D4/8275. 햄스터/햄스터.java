@@ -3,99 +3,103 @@ import java.util.*;
 
 public class Solution {
 	
-	// 햄스터 우리 개수 : N
-	// 각 우리의 햄스터 수 : X이하
-	// 기록 수 : M
-	// l번 우리에서 r번 우리까지의 햄스터 수 -> s 마리
-	
 	static int N,X,M;
-	static int[][] rec;
-	static int[] cage;
+	static int[][] note;
+	static int[] selected;
 	static boolean isOk;
-	static int num;
-	static int res;
-	static int[] ans;
-	//static ArrayList<ArrayList<Integer>> list ;
-	
-	// 가능한 방법이 여러 가지 일 경우, 햄스터 수가 가장 많은 것
-	// 가능한 방법이 여러가지 일 경우, 사전순으로 가장 앞선 것 
+	static int maxSum;
+	static int[] res;
 
 	public static void main(String[] args) throws IOException{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringBuilder sb = new StringBuilder();
 		StringTokenizer st;
 		int T = Integer.parseInt(br.readLine());
 		for(int tc=1;tc<=T;tc++) {
-			res = 0;
-			isOk = false;
 			st = new StringTokenizer(br.readLine());
-			N = Integer.parseInt(st.nextToken());  // 햄스터 우리 수
-			X = Integer.parseInt(st.nextToken());  // 각 우리에 최대 X마리
-			M = Integer.parseInt(st.nextToken());  // 기록수 
-			rec = new int[M][3];
+			N = Integer.parseInt(st.nextToken());  // 우리 개수
+			X = Integer.parseInt(st.nextToken());  // 최대 마리 수
+			M = Integer.parseInt(st.nextToken());  // 기록 수 
+			isOk = false;
 			
+			// 기록 
+			note = new int[M][3];
+			res = new int[N+1];
 			for(int i=0;i<M;i++) {
 				st = new StringTokenizer(br.readLine());
-				// a번 우리에서 b번 우리까지의 햄스터 수 s
-				rec[i][0] = Integer.parseInt(st.nextToken());
-				rec[i][1] = Integer.parseInt(st.nextToken());
-				rec[i][2] = Integer.parseInt(st.nextToken());
-				
+				int l = Integer.parseInt(st.nextToken());
+				int r = Integer.parseInt(st.nextToken());
+				int s = Integer.parseInt(st.nextToken());
+				note[i][0] = l;
+				note[i][1] = r;
+				note[i][2] = s;
 			}
-			cage = new int[N+1];
-			ans = new int[N+1];
-			
+			selected = new int[N+1];
+			maxSum=0;
 			perm(1);
-			if(!isOk) {
-				System.out.println("#"+tc +" "+(-1));
-			}else {
-				System.out.print("#"+tc +" ");
-				for(int idx=1;idx<=N;idx++) {
-					System.out.print(ans[idx]+" ");
+			sb.append("#").append(tc).append(" ");
+			if(isOk) {
+				for(int i=1;i<=N;i++) {
+					sb.append(res[i]).append(" ");
 				}
-				System.out.println();
+			}else {
+				sb.append(-1);
 			}
+			
+			
+			sb.append("\n");
 		}
-		
+		System.out.println(sb);
+
 	}
-	// 중복순열 
-	public static void perm(int idx) {
-		//if(isOk) return;
+	
+	// 중복 순열
+	public static void perm(int cnt) {
+		//System.out.println("순열 !!");
 		
-		if(idx==N+1) {
+		if(cnt==N+1) {
+			
 			if(check()) {
+				//System.out.println("통과------------------ ");
 				isOk = true;
 				int sum=0;
-				for(int i=1;i<=N;i++) {
-					sum+=cage[i];
+				for(int i=0;i<=N;i++) {
+					sum+=selected[i];
+					//System.out.print(selected[i]+" ");
 				}
-				if(res<sum) {
-					//ans = cage;
-					for(int i=1;i<=N;i++) {
-						ans[i]=cage[i];
+				//System.out.println();
+				
+				if(maxSum < sum) {
+					maxSum = sum;
+					for(int i=0;i<=N;i++) {
+						res[i]=selected[i];
 					}
-					res = sum;
 				}
 			}
 			return;
 		}
+		
+		
 		for(int i=0;i<=X;i++) {
-			cage[idx] = i;
-			perm(idx+1);
+			selected[cnt] = i;
+			perm(cnt+1);
 		}
 	}
+	
+	// 조건을 충족하는지 
 	public static boolean check() {
-		int res = 0;
+		//System.out.println("확인 ");
 		for(int i=0;i<M;i++) {
 			int sum=0;
-			for(int j=rec[i][0];j<=rec[i][1];j++) {
-				sum+=cage[j];
+			for(int j=note[i][0];j<=note[i][1];j++) {
+				sum+=selected[j];
 			}
-			if(sum==rec[i][2]) {
-				res++;
+			if(sum!= note[i][2]) {
+				//System.out.println("조건 만족 안해!!!!!!!!!!!");
+				return false;
 			}
 		}
-		if(res==M) return true;
-		return false;
+		return true;
 	}
 
 }

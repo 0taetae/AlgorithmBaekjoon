@@ -3,28 +3,27 @@ import java.util.*;
 
 public class Solution {
 	
-	// 출발지에서 도착지까지 가는 경로 중에 복구 시간이 가장 짧은 경로에 대한 총 복구 시간
-	// => 최단 경로 
-	
-	// 출발지 : 0,0
-	// 도착지 : N-1,N-1
-	
 	static int N;
-	static int[][] map;
-	static int[][] dist;
-	static class Info{
-		int x, y;
-		Info(int x, int y){
-			this.x =x;
-			this.y = y;
-		}
-		
-	}
+	static int[][] map, dist;
 	static int[] dx = {-1,1,0,0};
 	static int[] dy = {0,0,-1,1};
+	static class Info implements Comparable<Info>{
+		int x,y,cost;
+		Info(int x, int y,int cost){
+			this.x = x;
+			this.y = y;
+			this.cost = cost;
+		}
+		@Override
+		public int compareTo(Info o) {
+			return this.cost - o.cost;
+		}
+	}
 
 	public static void main(String[] args) throws IOException{
+		
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringBuilder sb = new StringBuilder();
 		int T = Integer.parseInt(br.readLine());
 		for(int tc=1;tc<=T;tc++) {
 			N = Integer.parseInt(br.readLine());
@@ -37,33 +36,42 @@ public class Solution {
 					dist[r][c] = Integer.MAX_VALUE;
 				}
 			}
-			
-			check();
-			System.out.println("#"+tc+" "+dist[N-1][N-1]);
+//			for(int r=0;r<N;r++) {
+//				for(int c=0;c<N;c++) {
+//					System.out.print(map[r][c]+" ");
+//				}
+//				System.out.println();
+//			}
+			dist[0][0] = 0;
+			bfs();
+			sb.append("#").append(tc).append(" ").append(dist[N-1][N-1]).append("\n");
 		}
+		System.out.println(sb);
 
 	}
-	// 다익스트라 
-	public static void check() {
-		Queue<Info> q = new LinkedList<>();
-		q.add(new Info(0,0));
-		dist[0][0] = map[0][0];
+	public static void bfs() {
+		PriorityQueue<Info> q = new PriorityQueue<>();
+		//boolean[][] visited = new boolean[N][N];
+		q.add(new Info(0,0,dist[0][0]));
+		//visited[0][0] = true;
 		
 		while(!q.isEmpty()) {
 			Info cur = q.poll();
 			
 			for(int dir=0;dir<4;dir++) {
+				
 				int nx = cur.x + dx[dir];
 				int ny = cur.y + dy[dir];
 				
-				if(nx<0 || ny<0 || nx>=N || ny>=N) continue;
+				if(nx<0 || ny<0 || nx>=N|| ny>=N) continue;
 				
-				if(dist[nx][ny]>dist[cur.x][cur.y]+map[nx][ny]) {
+				if(dist[nx][ny] > dist[cur.x][cur.y]+map[nx][ny]) {
 					dist[nx][ny] = dist[cur.x][cur.y]+map[nx][ny];
-					q.add(new Info(nx,ny));
+					q.add(new Info(nx,ny,dist[nx][ny]));
 				}
 			}
 		}
+		
 	}
 
 }

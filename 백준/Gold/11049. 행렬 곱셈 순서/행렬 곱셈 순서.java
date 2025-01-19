@@ -26,13 +26,19 @@ public class Main {
 			}
 		}
 		
-		for(int i=1;i<N;i++) {
-			for(int j=0;j+i<N;j++) {
-				for(int k=j;k<i+j;k++) {
-					dp[j][i+j] = Math.min(dp[j][i+j],dp[j][k]+dp[k+1][i+j]+size[j][0] * size[k][1]*size[i+j][1]);
-				}
-			}
-		}
+		for (int len = 1; len < N; len++) {
+            for (int i = 0; i + len < N; i++) {
+                int j = i + len;
+                for (int k = i; k < j; k++) {
+        	    /* (행렬 i부터 행렬 k까지 곱하는데 드는 최소 비용) + (행렬 k+1부터 행렬 j까지 곱하는데 드는 최소 비용) 
+                         + 곱셈 비용(행렬 i ~ 행렬 k와 행렬 k+1 ~ 행렬 j를 곱할 때 비용)
+                       곱셈 비용 = 행렬 i의 행 개수 * 행렬 k의 열 개수 * 행렬 j의 열 개수 
+                    */
+                    int cost = dp[i][k] + dp[k + 1][j] + size[i][0] * size[k][1] * size[j][1]; 
+                    dp[i][j] = Math.min(dp[i][j], cost);
+                }
+            }
+        }
 		System.out.println(dp[0][N-1]);
 
 	}

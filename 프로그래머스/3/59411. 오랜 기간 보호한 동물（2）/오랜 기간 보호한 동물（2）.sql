@@ -1,0 +1,4 @@
+SELECT ai.ANIMAL_ID, ai.NAME
+from ANIMAL_INS ai join ANIMAL_OUTS ao
+on ai.ANIMAL_ID = ao.ANIMAL_ID
+order by DATEDIFF(ao.DATETIME, ai.DATETIME) DESC limit 2

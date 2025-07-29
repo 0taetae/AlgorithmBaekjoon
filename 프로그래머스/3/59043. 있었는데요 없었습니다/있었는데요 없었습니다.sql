@@ -1,0 +1,5 @@
+SELECT ao.ANIMAL_ID, ao.NAME
+FROM ANIMAL_INS ai join ANIMAL_OUTS ao
+on ai.ANIMAL_ID = ao.ANIMAL_ID
+where ao.DATETIME <= ai.DATETIME
+order by ai.DATETIME

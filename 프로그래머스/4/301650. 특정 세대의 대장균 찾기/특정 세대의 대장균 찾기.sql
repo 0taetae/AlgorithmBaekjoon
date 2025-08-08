@@ -1,0 +1,8 @@
+SELECT child.ID
+FROM ECOLI_DATA child
+JOIN ECOLI_DATA parent
+ON child.PARENT_ID = parent.ID
+JOIN ECOLI_DATA grand
+ON parent.PARENT_ID = grand.ID
+WHERE grand.PARENT_ID is NULL
+ORDER BY child.ID
